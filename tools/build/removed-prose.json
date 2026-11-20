@@ -1,0 +1,762 @@
+{
+  "total": 975,
+  "removed": 54,
+  "list": [
+    {
+      "origIndex": 86,
+      "origId": "song_044",
+      "title": "岳阳楼记（节选）",
+      "author": "范仲淹",
+      "dynasty": "宋",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.2,
+        "avg": 5.8,
+        "pDen": 0.086,
+        "r4": 0.3
+      }
+    },
+    {
+      "origIndex": 318,
+      "origId": "weijin_019",
+      "title": "五柳先生传(节选)",
+      "author": "陶渊明",
+      "dynasty": "魏晋",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.074,
+        "avg": 4.63,
+        "pDen": 0.032,
+        "r4": 0.519
+      }
+    },
+    {
+      "origIndex": 412,
+      "origId": "han_017",
+      "title": "洛神赋",
+      "author": "曹植",
+      "dynasty": "魏晋",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.2,
+        "avg": 5.6,
+        "pDen": 0.071,
+        "r4": 0.6
+      }
+    },
+    {
+      "origIndex": 578,
+      "origId": "song_193",
+      "title": "醉翁亭记（节选）",
+      "author": "欧阳修",
+      "dynasty": "宋",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.4,
+        "avg": 5.6,
+        "pDen": 0.179,
+        "r4": 0.3
+      }
+    },
+    {
+      "origIndex": 579,
+      "origId": "tang_306",
+      "title": "滕王阁序（节选）",
+      "author": "王勃",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.333,
+        "avg": 5.67,
+        "pDen": 0.059,
+        "r4": 0.333
+      }
+    },
+    {
+      "origIndex": 580,
+      "origId": "weijin_026",
+      "title": "出师表（节选）",
+      "author": "诸葛亮",
+      "dynasty": "魏晋",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.6,
+        "avg": 6,
+        "pDen": 0.033,
+        "r4": 0.3
+      }
+    },
+    {
+      "origIndex": 581,
+      "origId": "tang_307",
+      "title": "谏太宗十思疏（节选）",
+      "author": "魏征",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 1,
+        "avg": 5.33,
+        "pDen": 0.188,
+        "r4": 0
+      }
+    },
+    {
+      "origIndex": 582,
+      "origId": "xianqin_017",
+      "title": "逍遥游（节选）",
+      "author": "庄子",
+      "dynasty": "先秦",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.3,
+        "avg": 4.6,
+        "pDen": 0.109,
+        "r4": 0.4
+      }
+    },
+    {
+      "origIndex": 583,
+      "origId": "xianqin_018",
+      "title": "劝学（节选）",
+      "author": "荀子",
+      "dynasty": "先秦",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.167,
+        "avg": 4.5,
+        "pDen": 0.074,
+        "r4": 0.25
+      }
+    },
+    {
+      "origIndex": 584,
+      "origId": "xianqin_019",
+      "title": "鱼我所欲也（节选）",
+      "author": "孟子",
+      "dynasty": "先秦",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.333,
+        "avg": 4.25,
+        "pDen": 0.196,
+        "r4": 0.083
+      }
+    },
+    {
+      "origIndex": 585,
+      "origId": "xianqin_020",
+      "title": "生于忧患死于安乐（节选）",
+      "author": "孟子",
+      "dynasty": "先秦",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0,
+        "avg": 5.75,
+        "pDen": 0.022,
+        "r4": 0.375
+      }
+    },
+    {
+      "origIndex": 586,
+      "origId": "xianqin_021",
+      "title": "曹刿论战（节选）",
+      "author": "左丘明",
+      "dynasty": "先秦",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0,
+        "avg": 3.4,
+        "pDen": 0.059,
+        "r4": 0.4
+      }
+    },
+    {
+      "origIndex": 587,
+      "origId": "xianqin_022",
+      "title": "邹忌讽齐王纳谏（节选）",
+      "author": "刘向",
+      "dynasty": "先秦",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.333,
+        "avg": 4.67,
+        "pDen": 0.321,
+        "r4": 0
+      }
+    },
+    {
+      "origIndex": 733,
+      "origId": "tang_399",
+      "title": "春思赋",
+      "author": "王勃",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 1,
+        "avg": 7,
+        "pDen": 0,
+        "r4": 0
+      }
+    },
+    {
+      "origIndex": 738,
+      "origId": "tang_400",
+      "title": "阿房宫赋",
+      "author": "杜牧",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.216,
+        "avg": 4.61,
+        "pDen": 0.09,
+        "r4": 0.595
+      }
+    },
+    {
+      "origIndex": 739,
+      "origId": "song_221",
+      "title": "六国论",
+      "author": "苏洵",
+      "dynasty": "宋",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.235,
+        "avg": 5.32,
+        "pDen": 0.094,
+        "r4": 0.343
+      }
+    },
+    {
+      "origIndex": 740,
+      "origId": "tang_400",
+      "title": "师说",
+      "author": "韩愈",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.318,
+        "avg": 5.18,
+        "pDen": 0.147,
+        "r4": 0.227
+      }
+    },
+    {
+      "origIndex": 741,
+      "origId": "song_221",
+      "title": "赤壁赋",
+      "author": "苏轼",
+      "dynasty": "宋",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.227,
+        "avg": 5.54,
+        "pDen": 0.108,
+        "r4": 0.309
+      }
+    },
+    {
+      "origIndex": 744,
+      "origId": "weijin_029",
+      "title": "陈情表",
+      "author": "李密",
+      "dynasty": "魏晋",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.138,
+        "avg": 5.05,
+        "pDen": 0.021,
+        "r4": 0.649
+      }
+    },
+    {
+      "origIndex": 745,
+      "origId": "weijin_029",
+      "title": "兰亭集序",
+      "author": "王羲之",
+      "dynasty": "魏晋",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.234,
+        "avg": 5.06,
+        "pDen": 0.086,
+        "r4": 0.453
+      }
+    },
+    {
+      "origIndex": 746,
+      "origId": "song_221",
+      "title": "前赤壁赋",
+      "author": "苏轼",
+      "dynasty": "宋",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.263,
+        "avg": 5.53,
+        "pDen": 0.105,
+        "r4": 0.368
+      }
+    },
+    {
+      "origIndex": 747,
+      "origId": "han_031",
+      "title": "过秦论（上）",
+      "author": "贾谊",
+      "dynasty": "汉",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.189,
+        "avg": 4.71,
+        "pDen": 0.085,
+        "r4": 0.311
+      }
+    },
+    {
+      "origIndex": 748,
+      "origId": "han_031",
+      "title": "报任安书（节选）",
+      "author": "司马迁",
+      "dynasty": "汉",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.129,
+        "avg": 4.53,
+        "pDen": 0.053,
+        "r4": 0.387
+      }
+    },
+    {
+      "origIndex": 749,
+      "origId": "weijin_029",
+      "title": "归去来兮辞",
+      "author": "陶渊明",
+      "dynasty": "魏晋",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.133,
+        "avg": 5.65,
+        "pDen": 0.038,
+        "r4": 0.2
+      }
+    },
+    {
+      "origIndex": 781,
+      "origId": "song_221",
+      "title": "秋声赋",
+      "author": "欧阳修",
+      "dynasty": "宋",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.259,
+        "avg": 4.79,
+        "pDen": 0.093,
+        "r4": 0.432
+      }
+    },
+    {
+      "origIndex": 801,
+      "origId": "weijin_030",
+      "title": "桃花源记",
+      "author": "陶渊明",
+      "dynasty": "魏晋",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.235,
+        "avg": 4.09,
+        "pDen": 0.022,
+        "r4": 0.5
+      }
+    },
+    {
+      "origIndex": 830,
+      "origId": "xianqin_026",
+      "title": "风赋（节选）",
+      "author": "宋玉",
+      "dynasty": "先秦",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.273,
+        "avg": 5.36,
+        "pDen": 0.102,
+        "r4": 0.182
+      }
+    },
+    {
+      "origIndex": 831,
+      "origId": "xianqin_026",
+      "title": "登徒子好色赋（节选）",
+      "author": "宋玉",
+      "dynasty": "先秦",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.267,
+        "avg": 5.6,
+        "pDen": 0.107,
+        "r4": 0.4
+      }
+    },
+    {
+      "origIndex": 949,
+      "origId": "tang_403",
+      "title": "祭十二郎文",
+      "author": "韩愈",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.29,
+        "avg": 5.03,
+        "pDen": 0.045,
+        "r4": 0.323
+      }
+    },
+    {
+      "origIndex": 950,
+      "origId": "tang_403",
+      "title": "送李愿归盘谷序",
+      "author": "韩愈",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.316,
+        "avg": 4.97,
+        "pDen": 0.082,
+        "r4": 0.289
+      }
+    },
+    {
+      "origIndex": 951,
+      "origId": "tang_403",
+      "title": "进学解",
+      "author": "韩愈",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.286,
+        "avg": 5.19,
+        "pDen": 0.046,
+        "r4": 0.333
+      }
+    },
+    {
+      "origIndex": 952,
+      "origId": "tang_403",
+      "title": "子产不毁乡校颂",
+      "author": "韩愈",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.143,
+        "avg": 3.95,
+        "pDen": 0.06,
+        "r4": 0.762
+      }
+    },
+    {
+      "origIndex": 953,
+      "origId": "tang_403",
+      "title": "原毁",
+      "author": "韩愈",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.159,
+        "avg": 4.26,
+        "pDen": 0.146,
+        "r4": 0.261
+      }
+    },
+    {
+      "origIndex": 954,
+      "origId": "tang_403",
+      "title": "桐叶封弟辩",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.304,
+        "avg": 5.98,
+        "pDen": 0.113,
+        "r4": 0.174
+      }
+    },
+    {
+      "origIndex": 955,
+      "origId": "tang_403",
+      "title": "捕蛇者说",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.425,
+        "avg": 5.39,
+        "pDen": 0.136,
+        "r4": 0.115
+      }
+    },
+    {
+      "origIndex": 956,
+      "origId": "tang_403",
+      "title": "种树郭橐驼传",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.25,
+        "avg": 5.32,
+        "pDen": 0.11,
+        "r4": 0.333
+      }
+    },
+    {
+      "origIndex": 957,
+      "origId": "tang_403",
+      "title": "段太尉逸事状",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.154,
+        "avg": 5.28,
+        "pDen": 0.01,
+        "r4": 0.128
+      }
+    },
+    {
+      "origIndex": 958,
+      "origId": "tang_403",
+      "title": "封建论",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.318,
+        "avg": 4.93,
+        "pDen": 0.134,
+        "r4": 0.205
+      }
+    },
+    {
+      "origIndex": 959,
+      "origId": "tang_403",
+      "title": "三戒",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.302,
+        "avg": 4.19,
+        "pDen": 0.067,
+        "r4": 0.209
+      }
+    },
+    {
+      "origIndex": 960,
+      "origId": "tang_403",
+      "title": "愚溪诗序",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.357,
+        "avg": 4.86,
+        "pDen": 0.099,
+        "r4": 0.179
+      }
+    },
+    {
+      "origIndex": 961,
+      "origId": "tang_403",
+      "title": "始得西山宴游记",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.219,
+        "avg": 4.84,
+        "pDen": 0.061,
+        "r4": 0.375
+      }
+    },
+    {
+      "origIndex": 962,
+      "origId": "tang_403",
+      "title": "小石潭记",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.231,
+        "avg": 4.26,
+        "pDen": 0.018,
+        "r4": 0.462
+      }
+    },
+    {
+      "origIndex": 963,
+      "origId": "tang_403",
+      "title": "钴鉧潭记",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.2,
+        "avg": 5.8,
+        "pDen": 0.075,
+        "r4": 0.267
+      }
+    },
+    {
+      "origIndex": 964,
+      "origId": "tang_403",
+      "title": "钴鉧潭西小丘记",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.275,
+        "avg": 5.16,
+        "pDen": 0.099,
+        "r4": 0.157
+      }
+    },
+    {
+      "origIndex": 965,
+      "origId": "tang_403",
+      "title": "至小丘西小石潭记",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.154,
+        "avg": 4.08,
+        "pDen": 0.019,
+        "r4": 0.462
+      }
+    },
+    {
+      "origIndex": 966,
+      "origId": "tang_403",
+      "title": "袁家渴记",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.234,
+        "avg": 5.04,
+        "pDen": 0.046,
+        "r4": 0.468
+      }
+    },
+    {
+      "origIndex": 967,
+      "origId": "tang_403",
+      "title": "石渠记",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.154,
+        "avg": 4.92,
+        "pDen": 0.057,
+        "r4": 0.487
+      }
+    },
+    {
+      "origIndex": 968,
+      "origId": "tang_403",
+      "title": "石涧记",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.205,
+        "avg": 5,
+        "pDen": 0.123,
+        "r4": 0.487
+      }
+    },
+    {
+      "origIndex": 969,
+      "origId": "tang_403",
+      "title": "小石城山记",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.35,
+        "avg": 5.53,
+        "pDen": 0.086,
+        "r4": 0.2
+      }
+    },
+    {
+      "origIndex": 970,
+      "origId": "tang_403",
+      "title": "游黄溪记",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.203,
+        "avg": 4.77,
+        "pDen": 0.064,
+        "r4": 0.333
+      }
+    },
+    {
+      "origIndex": 971,
+      "origId": "tang_403",
+      "title": "贺进士王参元失火书",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.287,
+        "avg": 6.3,
+        "pDen": 0.108,
+        "r4": 0.161
+      }
+    },
+    {
+      "origIndex": 972,
+      "origId": "tang_403",
+      "title": "与韩愈论史官书",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.161,
+        "avg": 6.16,
+        "pDen": 0.131,
+        "r4": 0.129
+      }
+    },
+    {
+      "origIndex": 973,
+      "origId": "tang_403",
+      "title": "答韦中立论师道书",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.243,
+        "avg": 5.11,
+        "pDen": 0.042,
+        "r4": 0.297
+      }
+    },
+    {
+      "origIndex": 974,
+      "origId": "tang_403",
+      "title": "梓人传",
+      "author": "柳宗元",
+      "dynasty": "唐",
+      "reason": "title-blacklist",
+      "stats": {
+        "r57": 0.361,
+        "avg": 4.98,
+        "pDen": 0.089,
+        "r4": 0.246
+      }
+    }
+  ]
+}

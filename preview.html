@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>飞花令 v0.1 · 浏览器预览（非真机）</title>
+<style>
+  html, body { overflow-x: hidden; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 12px;
+    background: #1E1A16; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+  canvas { width: 375px; height: 667px; box-shadow: 0 12px 40px rgba(0,0,0,.5); border-radius: 12px; }
+  .tip { color: #8a7f6e; font-size: 12px; text-align: center; width: 340px; margin: 0 auto; line-height: 1.5; }
+  .tip b { color: #C9372C; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="tip">
+  <b>浏览器预览壳</b>——逻辑与微信端同源（platform.js 三态适配），但非真机：帧率、safeArea、胶囊菜单、字体渲染以微信开发者工具 + 真机为准
+</div>
+<script src="./preview/bundle.js"></script>
+</body>
+</html>

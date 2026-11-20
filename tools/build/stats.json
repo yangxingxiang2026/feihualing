@@ -1,0 +1,177 @@
+{
+  "pool": [
+    "人",
+    "山",
+    "风",
+    "月",
+    "春",
+    "花",
+    "天",
+    "水"
+  ],
+  "poems": {
+    "raw": 975,
+    "proseRemoved": 54,
+    "final": 853,
+    "mergedBodyGroups": 57
+  },
+  "lines": {
+    "total": 5540,
+    "droppedDup": 143,
+    "droppedLen57": 1365
+  },
+  "corpusBytes": 176325,
+  "poemsBytes": 36684,
+  "uniqueAuthors": 207,
+  "levelDist": {
+    "e": 414,
+    "m": 2994,
+    "h": 2132
+  },
+  "coverage": [
+    {
+      "char": "人",
+      "total": 357,
+      "byLevel": {
+        "e": {
+          "lines": 20,
+          "authors": 15
+        },
+        "m": {
+          "lines": 207,
+          "authors": 86
+        },
+        "h": {
+          "lines": 130,
+          "authors": 33
+        }
+      }
+    },
+    {
+      "char": "山",
+      "total": 278,
+      "byLevel": {
+        "e": {
+          "lines": 29,
+          "authors": 18
+        },
+        "m": {
+          "lines": 163,
+          "authors": 73
+        },
+        "h": {
+          "lines": 86,
+          "authors": 28
+        }
+      }
+    },
+    {
+      "char": "风",
+      "total": 269,
+      "byLevel": {
+        "e": {
+          "lines": 31,
+          "authors": 21
+        },
+        "m": {
+          "lines": 158,
+          "authors": 88
+        },
+        "h": {
+          "lines": 80,
+          "authors": 31
+        }
+      }
+    },
+    {
+      "char": "月",
+      "total": 219,
+      "byLevel": {
+        "e": {
+          "lines": 28,
+          "authors": 22
+        },
+        "m": {
+          "lines": 117,
+          "authors": 57
+        },
+        "h": {
+          "lines": 74,
+          "authors": 20
+        }
+      }
+    },
+    {
+      "char": "春",
+      "total": 203,
+      "byLevel": {
+        "e": {
+          "lines": 27,
+          "authors": 18
+        },
+        "m": {
+          "lines": 123,
+          "authors": 62
+        },
+        "h": {
+          "lines": 53,
+          "authors": 20
+        }
+      }
+    },
+    {
+      "char": "花",
+      "total": 200,
+      "byLevel": {
+        "e": {
+          "lines": 21,
+          "authors": 14
+        },
+        "m": {
+          "lines": 132,
+          "authors": 66
+        },
+        "h": {
+          "lines": 47,
+          "authors": 18
+        }
+      }
+    },
+    {
+      "char": "天",
+      "total": 197,
+      "byLevel": {
+        "e": {
+          "lines": 14,
+          "authors": 13
+        },
+        "m": {
+          "lines": 98,
+          "authors": 52
+        },
+        "h": {
+          "lines": 85,
+          "authors": 25
+        }
+      }
+    },
+    {
+      "char": "水",
+      "total": 178,
+      "byLevel": {
+        "e": {
+          "lines": 15,
+          "authors": 14
+        },
+        "m": {
+          "lines": 107,
+          "authors": 58
+        },
+        "h": {
+          "lines": 56,
+          "authors": 22
+        }
+      }
+    }
+  ]
+}
