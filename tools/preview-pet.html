@@ -1,0 +1,59 @@
+<!doctype html>
+<html><meta charset="utf8">
+<body style="margin:0;background:#F6EFE2">
+<canvas id="c" width="1240" height="520"></canvas>
+<script>document.write('<script src="../src/actors/tiger_renderer.js?v=' + Math.random() + '"><\/script>');</script>
+<script>document.write('<script src="../js/ui/pet.js?v=' + Math.random() + '"><\/script>');</script>
+<!--MAIN-->
+<script>
+  var cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  ctx.fillStyle = '#F6EFE2'; ctx.fillRect(0, 0, 1240, 520);
+
+  var BOX = { w: 120, h: 168 };
+
+  // 手动驱动一只 pet 实例到目标时刻（秒）——盒必须用真实屏幕坐标：
+  // trigger 时特效锚点（fx.x/y）按盒快照，特效层与立绘若不同盒会画到别处
+  function drive(zone, secs, comboTimes, kind, x, y) {
+    var p = Pet.create();
+    var box = { x: x || 0, y: y || 0, w: BOX.w, h: BOX.h };
+    p.setBox(box, kind || 'full');
+    if (comboTimes) { for (var i = 0; i < comboTimes - 1; i++) { p.trigger(zone); p.update(0.5); } }
+    p.trigger(zone);
+    var n = Math.round(secs / 0.02);
+    for (var j = 0; j < n; j++) p.update(0.02);
+    return p;
+  }
+
+  // 画一只小虎（应用 pet transform，支点=盒底中心）
+  function cell(x, y, inst, label, t) {
+    var box = { x: x, y: y, w: BOX.w, h: BOX.h };
+    var off = inst.offset();
+    var pz = inst.pose();
+    var pivX = box.x + box.w / 2, pivY = box.y + box.h;
+    ctx.save();
+    ctx.translate(pivX + off.dx, pivY + off.dy);
+    ctx.rotate(off.rot);
+    if (off.sx !== 1 || off.sy !== 1) ctx.scale(off.sx, off.sy);
+    ctx.translate(-pivX, -pivY);
+    TigerRenderer.draw(ctx, { state: pz.state || 'idle', t: t || 0.5, x: x, y: y, scale: box.h / 560, phase: pz.phase });
+    ctx.restore();
+    inst.draw(ctx);
+    ctx.fillStyle = '#6B4423'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(label, box.x + box.w / 2, box.y + box.h + 20);
+  }
+
+  // 第一排：常规互动
+  cell(30, 40, drive('head', 0.30, 0, 'full', 30, 40), '摸头0.3s 蹭手');
+  cell(230, 40, drive('head', 0.90, 0, 'full', 230, 40), '摸头0.9s 化到七成');
+  cell(430, 40, drive('head', 1.28, 0, 'full', 430, 40), '摸头1.28s 啵弹回');
+  cell(630, 40, drive('belly', 0.11, 0, 'full', 630, 40), '摸肚0.11s 惊跳');
+  cell(830, 40, drive('foot', 0.15, 0, 'full', 830, 40), '挠脚0.15s 蓄力');
+  cell(1030, 40, drive('foot', 0.53, 3, 'full', 1030, 40), '挠脚3连 陀螺');
+
+  // 第二排：太空步 v3 五帧（九版：一脚平拖一脚踮脚 + 地面刻度滚动；无文字字幕）
+  var mwTimes = [0.3, 0.75, 1.62, 2.4, 3.4];
+  var mwLabels = ['太空步0.3s 左平拖', '太空步0.75s 拖到身后', '太空步1.62s 换脚', '太空步2.4s 右踮前移', '太空步3.4s 循环2'];
+  for (var k = 0; k < mwTimes.length; k++) {
+    cell(30 + k * 200, 300, drive('head', mwTimes[k], 3, 'full', 30 + k * 200, 300), mwLabels[k], mwTimes[k]);
+  }
+</script>

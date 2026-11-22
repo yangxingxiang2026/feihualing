@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>结算页 · 诗笺入口预览</title>
+<style>
+  html, body { margin: 0; background: #1E1A16; }
+  canvas { display: block; width: 375px; height: 667px; }
+</style>
+</head>
+<body>
+<script src="./bundle.js"></script>
+<script>
+  (function () {
+    if (!window.__fhl) return;
+    window.__fhl.app.settings.reduceMotion = true;
+    window.__fhl.goto('result', {
+      outcome: {
+        result: 'win', reason: 'roundsFull',
+        stats: { hits: 5, tigerHits: 3, maxCombo: 2, avgReact: 3.4, rounds: 12, keyword: '月', revenge: { kills: 1, newGrudge: [] } },
+        lines: ['明月几时有', '月照一天雪'],
+      },
+      lastPlayerLine: '明月几时有',
+      lastTigerLine: '月照一天雪',
+    });
+  })();
+</script>
+</body>
+</html>

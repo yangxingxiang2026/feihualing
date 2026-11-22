@@ -37,7 +37,7 @@ function recentKeywords() {
 
 /** 对局结算 → 累计战绩；返回是否保存成功（失败走上层「战绩未保存」细条） */
 function applyOutcome(outcome) {
-  // 教学局不计战绩、不入仇册（§4.19 定稿口径，此处补上实际短路——原实现漏了）
+  // 教学局不计战绩、不入错题本（§4.19 定稿口径，此处补上实际短路——原实现漏了）
   if (outcome && outcome.tutorial) return true;
   const r = loadRecord();
   r.games++;
@@ -66,7 +66,7 @@ function applyOutcome(outcome) {
   return ok;
 }
 
-// ---------------- 仇册（错句复仇 MVP，2026-11-19） ----------------
+// ---------------- 错题本（错句复仇 MVP，2026-11-19） ----------------
 // 条目：{ text, addedAt, avenged, ts }——text 为玩家失手回合的正解真句（库内、含当局令字）。
 // addedAt = 入册时的局数（record.games）；「满 3 局才甩」= 当前局数 - addedAt >= 2。
 const GRUDGE_MAX = 30;
@@ -115,7 +115,7 @@ function grudgeRipe() {
     .filter(e => !e.avenged && games - e.addedAt >= GRUDGE_RIPE_GAP)
     .map(e => e.text);
 }
-/** 仇册状态摘要（首页战绩签 / 结算页展示用） */
+/** 错题本状态摘要（首页战绩签 / 结算页展示用） */
 function grudgeSummary() {
   const g = loadGrudge();
   return { total: g.length, pending: g.filter(e => !e.avenged).length };

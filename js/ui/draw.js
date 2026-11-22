@@ -4,6 +4,20 @@
  * 铁律：rrect 用 arcTo 手写（禁 ctx.roundRect）；椭圆带兜底；阴影用偏移实底（禁 shadowBlur）；
  *       measureText 结果按 key 缓存；渐变对象布局期创建，禁止在 draw 循环内创建。
  */
+const { font } = require('./tokens');
+
+/**
+ * 大字按实测宽度收敛字号（2026-11-20 真机截图：设计值 96px 的「胜」溢出 97px 金框、
+ * 120px 令字溢出印卡内框——真机字体度量普遍比设计稿偏大 1.1–1.2 倍）。
+ * 以 measureText 实测宽为准，超限则等比缩字号；返回收敛后的 px 值。
+ */
+function fitSize(ctx, s, weight, size, family, maxW) {
+  const f = font(weight, size, family);
+  ctx.font = f;
+  const w = ctx.measureText(s).width;
+  if (w > maxW && w > 0) size = Math.max(12, Math.floor((size * maxW / w) * 10) / 10);
+  return size;
+}
 
 /** 圆角矩形路径（arcTo 四段，低版本基础库安全） */
 function rrect(ctx, x, y, w, h, r) {
@@ -171,4 +185,4 @@ function drawBaked(ctx, L0, W, H, bg) {
   }
   return false;
 }
-module.exports = { rrect, ell, shadow, text, textWidth, truncate, pill, gradBtn, makeVGrad, drawBaked, bar, seal, chevron, measureCache };
+module.exports = { rrect, ell, shadow, text, textWidth, truncate, pill, gradBtn, makeVGrad, drawBaked, bar, seal, chevron, measureCache, fitSize };

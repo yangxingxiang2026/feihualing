@@ -10,6 +10,7 @@ const { resolveTokens, T } = require('./js/ui/tokens');
 const { HomeScreen } = require('./js/ui/screens/home');
 const { BattleScreen } = require('./js/ui/screens/battle');
 const { ResultScreen } = require('./js/ui/screens/result');
+const { GlossScreen } = require('./js/ui/screens/gloss');
 const store = require('./js/app/store');
 const sound = require('./js/app/sound');
 const track = require('./js/app/track');
@@ -41,6 +42,7 @@ const app = {
     app.scene && app.scene.leave && app.scene.leave();
     if (sceneName === 'battle') app.scene = BattleScreen(app, params);
     else if (sceneName === 'result') app.scene = ResultScreen(app, params);
+    else if (sceneName === 'gloss') app.scene = GlossScreen(app, params);
     else app.scene = HomeScreen(app);
     app.scene.enter();
   },

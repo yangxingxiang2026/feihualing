@@ -57,9 +57,12 @@ function BattleScreen(app, params) {
   const match = new Match({
     mode, difficulty, tutorial,
     aiLevel: difficulty === 'easy' ? 'rookie' : 'normal',
-    seed: (Math.random() * 0xFFFFFFFF) >>> 0,
+    // 2026-11-20 修：原实现无条件 Math.random 覆盖，smoke/测试传入的 params.seed
+    // 被丢弃 → 冒烟不可复现（教学局提示复读是种子相关的间歇 bug，被随机性掩盖）。
+    // 传了 seed 就用传入值；线上不传才走随机。
+    seed: (params && params.seed != null) ? params.seed : (Math.random() * 0xFFFFFFFF) >>> 0,
     excludeKeywords: store.recentKeywords(),
-    // 错句复仇 MVP（2026-11-19）：已熟成的仇册错句交给诗童（教学局不带）
+    // 错句复仇 MVP（2026-11-19）：已熟成的错题本条目交给诗童（教学局不带）
     grudgeLines: tutorial ? [] : store.grudgeRipe(),
   });
   const self = {
@@ -213,7 +216,7 @@ function BattleScreen(app, params) {
             rounds: snap.outcome.stats.rounds || 0,
             dur: Math.round((Date.now() - startAt) / 1000),
             timeouts: snap.outcome.stats.timeouts || 0,
-            // 错句复仇：雪耻数 / 新入仇册数（行为数值，无文本）
+            // 错句复仇：雪耻数 / 新入错题本数（行为数值，无文本）
             rev: (snap.outcome.stats.revenge && snap.outcome.stats.revenge.kills) || 0,
             grudge: (snap.outcome.stats.revenge && snap.outcome.stats.revenge.newGrudge.length) || 0,
           });
@@ -265,7 +268,9 @@ function BattleScreen(app, params) {
       ctx.translate(rv.char.cx, rv.char.mid);
       ctx.scale(scaleP, scaleP);
       ctx.fillStyle = c.fg;
-      ctx.font = font(700, T.fs.hero, 'serif');
+      // 2026-11-20：亮相大字同因收敛（240px 设计值实测可到 ~260，压装饰线）→ 限宽 214
+      const heroFs = d.fitSize(ctx, snap.keyword, 700, T.fs.hero, 'serif', 214);
+      ctx.font = font(700, heroFs, 'serif');
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(snap.keyword, 0, 0);
       ctx.restore();
@@ -296,16 +301,17 @@ function BattleScreen(app, params) {
     const shake = (!app.settings.reduceMotion && shakeT >= 0) ? shakeOffset(shakeT) : 0;
     if (shake) { ctx.save(); ctx.translate(0, shake); }
     // 小虎半身像（L1，每帧；2026-11-20 触摸互动：摸头摇头/挠爪弹跳）
-    pet.setBox(sh.bustWin);
+    pet.setBox(sh.bustWin, 'bust');
     const tDraw = app.settings.reduceMotion ? 0.5 : t;
     const petOff = pet.offset();
+    const pz = pet.pose();
     ctx.save();
     const petPivX = sh.bustWin.x + sh.bustWin.w / 2, petPivY = sh.bustWin.y + sh.bustWin.h;
     ctx.translate(petPivX + petOff.dx, petPivY + petOff.dy);
     ctx.rotate(petOff.rot);
     if (petOff.sx !== 1 || petOff.sy !== 1) ctx.scale(petOff.sx, petOff.sy);
     ctx.translate(-petPivX, -petPivY);
-    tiger.bust(ctx, { win: sh.bustWin, state: pet.stateOverride() || tigerState(snap), t: tDraw });
+    tiger.bust(ctx, { win: sh.bustWin, state: pz.state || tigerState(snap), t: tDraw, phase: pz.phase });
     ctx.restore();
     pet.draw(ctx);
 
@@ -372,14 +378,16 @@ function BattleScreen(app, params) {
         d.text(ctx, '诗童 沉吟中' + dots, tb.x, tb.y + 11, font(400, 22, 'sans'), c.fg2, { maxW: tb.w });
       } else if (snap.phase === 'aiFeedback' && snap.feedback && snap.feedback.kind === 'aiPlay') {
         const rev = snap.revenge && !snap.revenge.avenged;
-        d.text(ctx, (rev ? '【仇册】诗童 · ' : '诗童 · ') + snap.feedback.text, tb.x, tb.y + 11,
+        // 2026-11-21 「仇册」更名「错题本」：标签由「【仇册】诗童 · 」改为「【错题本】」，
+        // 去掉「诗童 · 」抵掉多出的 3 个字宽（上句区 351px 固定 22px 字，长句否则会被省略成「…」）
+        d.text(ctx, (rev ? '【错题本】' : '诗童 · ') + snap.feedback.text, tb.x, tb.y + 11,
           font(400, 22, 'sans'), rev ? c.danger : c.fg2, { maxW: tb.w });
       } else if (snap.phase === 'aiFeedback' && snap.feedback && snap.feedback.kind === 'aiFail') {
         d.text(ctx, '诗童 没接上', tb.x, tb.y + 11, font(400, 22, 'sans'), c.success, { maxW: tb.w });
       } else if (lastShown) {
-        // 悬着的雪耻回合：上一拍诗童甩了你的错句，提示持续可见直到你接上
+        // 悬着的错题回合：上一拍诗童甩了你的错题，提示持续可见直到你接上
         const rev = snap.revenge && !snap.revenge.avenged;
-        d.text(ctx, (rev ? '【仇册】诗童 · ' : '诗童 · ') + lastShown, tb.x, tb.y + 11,
+        d.text(ctx, (rev ? '【错题本】' : '诗童 · ') + lastShown, tb.x, tb.y + 11,
           font(400, 22, 'sans'), rev ? c.danger : c.fg2, { maxW: tb.w });
       }
     } else {
@@ -394,7 +402,7 @@ function BattleScreen(app, params) {
       if (snap.phase === 'aiThink') {
         lineTxt = '诗童 沉吟中' + '.'.repeat(1 + Math.floor(snap.phaseT / 0.2) % 3);
       } else if (snap.phase === 'aiFeedback' && snap.feedback && snap.feedback.kind === 'aiPlay') {
-        lineTxt = (snap.revenge && !snap.revenge.avenged ? '【仇册】诗童接：' : '诗童接：') + snap.feedback.text;
+        lineTxt = (snap.revenge && !snap.revenge.avenged ? '【错题本】' : '诗童接：') + snap.feedback.text;
         if (snap.revenge && !snap.revenge.avenged) lineCol = c.danger;
       } else if (snap.phase === 'aiFeedback' && snap.feedback && snap.feedback.kind === 'aiFail') {
         lineTxt = '诗童没接上'; lineCol = c.success;
@@ -702,7 +710,8 @@ function BattleScreen(app, params) {
       // 2026-11-20 触摸互动：摸头/爪 → 动画 + 萌音 + 埋点（任何相位都可摸，抢答期也无妨）
       const zone = hit.slice(4);
       if (pet.trigger(zone)) {
-        sound.play(zone === 'head' ? 'purr' : 'chirp');
+        // 三版沙雕音：pet.soundFor 统一映射（head=purr/snore，paw=chirp/laugh）
+        sound.play(pet.soundFor(zone, pet._fx() && pet._fx().combo));
         track.track('fhl_pet', { zone: zone === 'head' ? 1 : 4, scr: 2 });
       }
       return;
@@ -811,7 +820,10 @@ function BattleScreen(app, params) {
     g.lineWidth = T.st.mid; g.strokeStyle = c.primaryGrad[1]; g.stroke();
     d.rrect(g, sc.inner.x, sc.inner.y, sc.inner.w, sc.inner.h, sc.inner.r);
     g.lineWidth = T.st.hair; g.strokeStyle = 'rgba(255,249,236,0.45)'; g.stroke();
-    d.text(g, snap.keyword, sh.keyword.cx, sh.keyword.mid, font(700, T.fs.keyword, 'serif'), c.onBrand, { align: 'center' });
+    // 2026-11-20 真机截图：120px 令字溢出 116px 内框（真机字体度量偏大）
+    // → fitSize 按实测宽收敛（限宽 96，内框留呼吸）
+    const kwFs = d.fitSize(g, snap.keyword, 700, T.fs.keyword, 'serif', 96);
+    d.text(g, snap.keyword, sh.keyword.cx, sh.keyword.mid, font(700, kwFs, 'serif'), c.onBrand, { align: 'center' });
     // B3 上句条（blocks 模式画框；choice 模式只有细字条）
     if (mode === 'blocks') {
       const lb = sh.lastBar;

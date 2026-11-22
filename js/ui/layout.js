@@ -181,13 +181,16 @@ function result(s) {
     tiger: { x: X(107.5, k), y: Y(212, topOff), scale: tigerScale },
     review: { x: X(12, k), y: yCard, w: 351 * k, h: cardH, r: 14 },
     miniSeal: { x: X(26, k), y: yCard + 18 + hX * 0.08, size: 56, inner: { x: X(32, k), y: yCard + 24 + hX * 0.08, size: 44 } },
-    rowMe: { label: { x: X(98, k), y: yCard + 14 + hX * 0.12, w: 40 * k, h: 20 }, text: { x: X(98, k), y: yCard + 36 + hX * 0.12, w: 253 * k, h: 28 } },
-    rowTiger: { label: { x: X(98, k), y: yCard + 62 + hX * 0.4, w: 60 * k, h: 20 }, text: { x: X(98, k), y: yCard + 84 + hX * 0.4, w: 253 * k, h: 28 } },
+    rowMe: { label: { x: X(98, k), y: yCard + 14 + hX * 0.12, w: 40 * k, h: 20 }, text: { x: X(98, k), y: yCard + 36 + hX * 0.12, w: 210 * k, h: 28 } },
+    rowTiger: { label: { x: X(98, k), y: yCard + 62 + hX * 0.4, w: 60 * k, h: 20 }, text: { x: X(98, k), y: yCard + 84 + hX * 0.4, w: 210 * k, h: 28 } },
+    // 诗笺入口（2026-11-21）：卡片右侧竖排书签，点击进「诗笺」看本局诗句的释义
+    glossBtn: { x: X(313, k), y: yCard + 30 + hX * 0.1, w: 42 * k, h: 84 },
     reasonMid: yCard + cardH - 18,     // 判定行锚卡底，卡拉伸时行距均匀
     againBtn: { x: X(12, k), y: yBtn, w: 157 * k, h: 88, r: 14 },
     shareBtn: { x: X(176, k), y: yBtn, w: 90 * k, h: 88, r: 14 },
     homeBtn: { x: X(273, k), y: yBtn, w: 90 * k, h: 88, r: 14 },
     hotRects: [
+      { id: 'result.gloss', x: X(310, k), y: yCard + 22 + hX * 0.1, w: 52 * k, h: 100 },
       { id: 'result.again', x: X(12, k), y: yBtn, w: 157 * k, h: 88 },
       { id: 'result.share', x: X(176, k), y: yBtn, w: 90 * k, h: 88 },
       { id: 'result.home', x: X(273, k), y: yBtn, w: 90 * k, h: 88 },
@@ -195,4 +198,43 @@ function result(s) {
   };
 }
 
-module.exports = { frame, home, battleShared, battleBlocks, battleChoice, reveal, result };
+/**
+ * 诗笺页（2026-11-21 二版：一首一页）
+ * 用户反馈「单句解析没有意义」→ 改为整首：题名 + 作者 → 全诗（本局句高亮）→ 诗童串讲 →
+ * 该句直译（降为第三层）。内容超出卡片高度时卡内滚动（长诗最长 960 字，如《长恨歌》）。
+ * 小虎半身像移到题名右侧，不再占一行气泡——串讲本身就是它在讲。
+ */
+function gloss(s) {
+  const { k, topOff, yBtn } = frame(s);
+  const tiger = { x: X(281, k), y: Y(24, topOff), w: X(78, k), h: X(86, k) };
+  const card = { x: X(16, k), y: Y(116, topOff), w: X(343, k), h: 0, r: 16 };
+  card.h = Math.max(240, yBtn - 14 - card.y);
+  const padX = 22, padTop = 16, padBottom = 16;
+  return {
+    k,
+    eyebrow: { x: X(18, k), y: Y(24, topOff) },
+    title: { x: X(18, k), y: Y(52, topOff), w: X(252, k) },
+    sub: { x: X(18, k), y: Y(85, topOff), w: X(168, k) },
+    page: { x: X(196, k), y: Y(78, topOff), w: X(74, k), h: 20 },
+    tiger: { win: tiger },
+    card,
+    // 卡内滚动视口（文字只画在这个矩形里，超出部分靠滚动露出）
+    view: { x: card.x + padX, y: card.y + padTop, w: card.w - padX * 2, h: card.h - padTop - padBottom },
+    // 正文行距（22px 字 / 34 行高）：五七言一行半联，词的长短句也自然成行
+    lineFs: 22, lineLH: 34,
+    introFs: 19, introLH: 31,
+    noteFs: 16, noteLH: 26,
+    prevBtn: { x: X(16, k), y: yBtn, w: X(100, k), h: 88, r: 14 },
+    nextBtn: { x: X(122, k), y: yBtn, w: X(100, k), h: 88, r: 14 },
+    backBtn: { x: X(228, k), y: yBtn, w: X(131, k), h: 88, r: 14 },
+    hotRects: [
+      { id: 'gloss.prev', x: X(16, k), y: yBtn, w: X(100, k), h: 88 },
+      { id: 'gloss.next', x: X(122, k), y: yBtn, w: X(100, k), h: 88 },
+      { id: 'gloss.back', x: X(228, k), y: yBtn, w: X(131, k), h: 88 },
+    ],
+    // 卡内滚动区（不是热区，只给屏幕层判断手势起手点用）
+    scrollArea: { x: card.x, y: card.y, w: card.w, h: card.h },
+  };
+}
+
+module.exports = { frame, home, battleShared, battleBlocks, battleChoice, reveal, result, gloss };

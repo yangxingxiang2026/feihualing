@@ -72,7 +72,9 @@ for (const { rel, src } of order) {
   out.push(src);
   out.push(`});`);
 }
-out.push(`  __req('', ${JSON.stringify(ENTRY)});`);
+// 2026-11-21：暴露调试句柄（浏览器预览/无头截图用；小游戏端不加载此 bundle）
+out.push(`  var __entry = __req('', ${JSON.stringify(ENTRY)});`);
+out.push(`  if (typeof window !== 'undefined') window.__fhl = __entry;`);
 out.push(`})();`);
 
 const destDir = path.join(ROOT, 'preview');

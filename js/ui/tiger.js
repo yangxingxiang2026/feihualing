@@ -22,6 +22,7 @@ function fullBody(ctx, opts) {
     x: opts.cx - (400 * opts.scale) / 2,
     y: opts.y0,
     scale: opts.scale,
+    phase: opts.phase,
   });
 }
 
@@ -49,6 +50,7 @@ function bust(ctx, opts) {
     x: win.x - BUST_WIN.x * s,
     y: win.y - BUST_WIN.y * s,
     scale: s,
+    phase: opts.phase,
   });
   ctx.restore();
 }

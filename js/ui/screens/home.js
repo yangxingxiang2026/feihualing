@@ -86,7 +86,7 @@ function HomeScreen(app) {
   let pressDown = null;   // 按下热区 id（持续到 touchend——修复慢点按无响应）
   let bubbleT = -1;       // 首次引导呼吸环剩余时间
   let toast = null;       // {text, t}——不画悬浮黑气泡，在战绩签数据行轮换显示
-  let recTap = 0;         // 战绩签点击轮换计数（仇册提示 ↔ 常规战绩）
+  let recTap = 0;         // 战绩签点击轮换计数（错题本提示 ↔ 常规战绩）
   let envSprite = null;   // 季节粒子 sprite（进屏烘焙一次）
   let rec = null;         // 战绩缓存（烘焙/动态层共用）
   const self = {
@@ -123,13 +123,14 @@ function HomeScreen(app) {
       const tDraw = app.settings.reduceMotion ? 0.5 : t;
       const tg = L.tiger;
       const petOff = pet.offset();
+      const pz = pet.pose();
       ctx.save();
       const pivX = tg.x + 400 * tg.scale / 2, pivY = tg.y + 560 * tg.scale;
       ctx.translate(pivX + petOff.dx, pivY + petOff.dy);
       ctx.rotate(petOff.rot);
       if (petOff.sx !== 1 || petOff.sy !== 1) ctx.scale(petOff.sx, petOff.sy);
       ctx.translate(-pivX, -pivY);
-      tiger.fullBody(ctx, { cx: tg.x + 400 * tg.scale / 2, y0: tg.y, scale: tg.scale, state: pet.stateOverride() || 'idle', t: tDraw });
+      tiger.fullBody(ctx, { cx: tg.x + 400 * tg.scale / 2, y0: tg.y, scale: tg.scale, state: pz.state || 'idle', t: tDraw, phase: pz.phase });
       ctx.restore();
       pet.draw(ctx);
       // L2 环境粒子（§4.22 展示②：季节 sprite——春花瓣/夏柳絮/秋落叶/冬雪粒；
@@ -189,7 +190,8 @@ function HomeScreen(app) {
             // 2026-11-20 触摸互动：摸头/肚/脚 → 动画 + 萌音 + 埋点（fhl_pet）
             const zone = hit.slice(4);
             if (pet.trigger(zone)) {
-              sound.play(zone === 'head' ? 'purr' : zone === 'belly' ? 'giggle' : 'chirp');
+              // 三版沙雕音：常规=嗷呜/惊叫/嗷呜；同区 3 连击=打呼噜/狂笑（pet.soundFor 统一映射）
+              sound.play(pet.soundFor(zone, pet._fx() && pet._fx().combo));
               track.track('fhl_pet', { zone: zone === 'head' ? 1 : zone === 'belly' ? 2 : 3, scr: 1 });
             }
           } else {
@@ -238,10 +240,12 @@ function HomeScreen(app) {
         if (app.settings.sound !== false) sound.play('pick');
         toast = { text: app.settings.sound === false ? '音效已关' : '音效已开', t: 2.0 };
       } else if (id === 'home.record') {
-        // 轮换展示：有未雪耻仇册时第一次点给仇册（错句复仇入口提示），再点回常规战绩
+        // 轮换展示：有未订正的错题本条目时第一次点给错题本提示，再点回常规战绩
         const gs = store.grudgeSummary();
         if (gs.pending > 0 && recTap++ % 2 === 0) {
-          toast = { text: `仇册 ${gs.pending} 句未雪耻 · 诗童记着呢`, t: 2.4 };
+          // 2026-11-21 「仇册」更名「错题本」：文案同时压到 10 字内，
+          // 旧「仇册 N 句未雪耻 · 诗童记着呢」实测超出战绩签数据行 217px 可用宽被省略成「…」
+          toast = { text: `错题本 ${gs.pending} 句，诗童记着`, t: 2.4 };
         } else if (rec && rec.games > 0) {
           toast = { text: `连胜纪录 ×${rec.bestCombo}`, t: 2.0 };
         } else {

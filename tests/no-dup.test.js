@@ -1,7 +1,7 @@
 'use strict';
 /**
  * 同局题目去重回归 + 难易分级核查（2026-11-20 用户反馈）：
- * ① 同一局内（含玩家题句 / 选项 / AI 出句 / 仇册甩句）任何诗句不得出现第二次；
+ * ① 同一局内（含玩家题句 / 选项 / AI 出句 / 错题本甩句）任何诗句不得出现第二次；
  * ② 难易分级（2026-11-20 二改）：简单档 tier0 核心名句五言优先；困难档 tier0 核心名句
  *    七言优先——首版「困难绕开 tier0 走教材名篇」被真机打回（冷句一题答不出），见 §4.26。
  */
@@ -29,7 +29,7 @@ function seen(seenSet, text, tag, round) {
   seenSet.add(text);
 }
 
-/** 完整跑一局 choice，收集全部出现过的诗句（玩家对/错、选项、AI、仇册甩句） */
+/** 完整跑一局 choice，收集全部出现过的诗句（玩家对/错、选项、AI、错题本甩句） */
 function runChoice(seed, roundMax) {
   const m = new Match({ mode: 'choice', seed, roundMax: roundMax || 12, difficulty: 'normal' });
   const seenSet = new Set();

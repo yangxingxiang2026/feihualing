@@ -115,14 +115,31 @@ function screenInfo() {
 function onTouch(handler) {
   if (isWx) {
     wx.onTouchStart(e => handler('start', e.touches[0]));
+    // 2026-11-21：诗笺页需要卡内滚动，补 move 事件（此前只转发 start/end）
+    wx.onTouchMove(e => { if (e.touches && e.touches[0]) handler('move', e.touches[0]); });
     wx.onTouchEnd(e => handler('end', (e.changedTouches && e.changedTouches[0]) || null));
     return;
   }
   if (typeof document !== 'undefined') {
     const c = document.querySelector('canvas');
     if (!c) return;
-    c.addEventListener('mousedown', e => handler('start', { clientX: e.clientX, clientY: e.clientY }));
-    c.addEventListener('mouseup', e => handler('end', { clientX: e.clientX, clientY: e.clientY }));
+    let down = false;
+    c.addEventListener('mousedown', e => {
+      down = true;
+      handler('start', { clientX: e.clientX, clientY: e.clientY });
+    });
+    // move 只在按下之后转发（浏览器里 mousemove 平时满天飞，不能当拖动）
+    c.addEventListener('mousemove', e => {
+      if (down) handler('move', { clientX: e.clientX, clientY: e.clientY });
+    });
+    // mouseup 绑 window：手指/鼠标滑出画布时也能收到 end，否则会卡在拖动态
+    const up = e => {
+      if (!down) return;
+      down = false;
+      handler('end', { clientX: e.clientX, clientY: e.clientY });
+    };
+    c.addEventListener('mouseup', up);
+    if (typeof window !== 'undefined') window.addEventListener('mouseup', up);
   }
 }
 

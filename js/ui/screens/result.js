@@ -22,6 +22,8 @@ function ResultScreen(app, params) {
   const lastTiger = (params && params.lastTigerLine) || '';
   // 教学局（P0-3）：文案与主按钮都换成「继续对诗」，把玩家直接送进正式对局，而不是回到首页重新选择
   const tutorial = !!outcome.tutorial;
+  // 从诗笺返回时不重复结算（enter() 里 applyOutcome 会把局数再加一次）
+  const noSave = !!(params && params.noSave);
 
   let L = null; let L0 = null;
   let pressed = null;     // 按下视觉 tint
@@ -41,7 +43,10 @@ function ResultScreen(app, params) {
   function reasonText() {
     const s = outcome.stats;
     const REASON = {
-      roundsFull: `${s.rounds || 12} 回合满 · 接对多者胜`,
+      // 2026-11-20 真机追问「12 回合怎么比分 13」：雪耻反杀翻倍奖励 +1 不计回合，
+      // 比分可超回合数 → 判定行点名解释（结算 stats 的「雪耻 N」已有对应数字）
+      roundsFull: `${s.rounds || 12} 回合满 · 接对多者胜`
+        + (s.revenge && s.revenge.kills > 0 ? `（雪耻奖励 +${s.revenge.kills}）` : ''),
       playerTimeout: '决策超时 · 判负',
       aiExhausted: '诗童接不上 · 判胜',
       poolExhausted: '诗句用尽 · 判胜',
@@ -59,7 +64,7 @@ function ResultScreen(app, params) {
   const self = {
     id: 'result', hotRects: [],
     enter() {
-      saved = store.applyOutcome(outcome);
+      saved = noSave ? true : store.applyOutcome(outcome);
       if (!saved) warnT = 2;
       build();
     },
@@ -82,13 +87,14 @@ function ResultScreen(app, params) {
       // 2026-11-20 触摸互动：小虎绘制包 offset（摸头摇头/摸肚摇摆/摸脚弹跳）
       const tg2 = L.tiger;
       const petOff = pet.offset();
+      const pz = pet.pose();
       ctx.save();
       const pivX2 = tg2.x + 400 * tg2.scale / 2, pivY2 = tg2.y + 560 * tg2.scale;
       ctx.translate(pivX2 + petOff.dx, pivY2 + petOff.dy);
       ctx.rotate(petOff.rot);
       if (petOff.sx !== 1 || petOff.sy !== 1) ctx.scale(petOff.sx, petOff.sy);
       ctx.translate(-pivX2, -pivY2);
-      tiger.fullBody(ctx, { cx: L.tiger.x + 400 * L.tiger.scale / 2, y0: L.tiger.y, scale: L.tiger.scale, state: pet.stateOverride() || m.state, t: st });
+      tiger.fullBody(ctx, { cx: L.tiger.x + 400 * L.tiger.scale / 2, y0: L.tiger.y, scale: L.tiger.scale, state: pz.state || m.state, t: st, phase: pz.phase });
       ctx.restore();
       pet.draw(ctx);
 
@@ -99,13 +105,23 @@ function ResultScreen(app, params) {
       ctx.save();
       ctx.globalAlpha = ease;
       const dy = app.settings.reduceMotion ? 0 : 12 * (1 - ease);
-      // 结果字（96px；「胜」时 2px 金方框，不实底）
+      // 结果字（设计 96px；「胜」时 2px 金方框，不实底）
+      // 2026-11-20 真机截图：「胜」溢出 97px 金框（真机字体度量偏大 1.1–1.2 倍）
+      // → fitSize 按实测宽收敛字号（限宽 82，框内留 ~7px 呼吸）；
+      //   入场加 back-out 弹性缩放（0.86→过冲→1），亮相更有「盖章」感
       const rc = L.resultChar;
       if (outcome.result === 'win') {
         ctx.lineWidth = 2; ctx.strokeStyle = c.gold;
         ctx.strokeRect(rc.cx - 48.5, rc.mid - 48.5 + dy, 97, 97);
       }
-      d.text(ctx, m.char, rc.cx, rc.mid + dy, font(700, T.fs.result, 'serif'), m.color(c), { align: 'center' });
+      const charFs = d.fitSize(ctx, m.char, 700, T.fs.result, 'serif', 82);
+      const backOut = 1 + 2.70158 * Math.pow(p - 1, 3) + 1.70158 * Math.pow(p - 1, 2);
+      const pop = app.settings.reduceMotion ? 1 : 0.86 + 0.14 * backOut;
+      ctx.save();
+      ctx.translate(rc.cx, rc.mid + dy);
+      ctx.scale(pop, pop);
+      d.text(ctx, m.char, 0, 0, font(700, charFs, 'serif'), m.color(c), { align: 'center' });
+      ctx.restore();
       // 2026-11-19 UI 评审 F：结果字下的装饰短横线，压住大字重心（随胜负同色）
       if (p > 0.6) {
         ctx.globalAlpha = ease * 0.8;
@@ -144,16 +160,35 @@ function ResultScreen(app, params) {
         statsFs = [18, 16, 15].find(fs => d.textWidth(ctx, statsText, font(400, fs, 'sans')) <= app.info.W - 24) || 15;
       }
       d.text(ctx, statsText, L.subtitle.cx, L.statsMid + dy, font(400, statsFs, 'sans'), c.fg2, { align: 'center', maxW: app.info.W - 24 });
-      // 回顾卡内容
+      // 回顾卡内容（2026-11-20 真机同因：令字印章字溢出内框 → fitSize 收敛）
+      const miniFs = d.fitSize(ctx, s.keyword, 600, 38, 'serif', 34);
       d.seal(ctx, L.miniSeal.x, L.miniSeal.y, L.miniSeal.size, c.primary, 'rgba(255,249,236,0.35)',
-        s.keyword, font(600, 38, 'serif'), c.onBrand);
+        s.keyword, font(600, miniFs, 'serif'), c.onBrand);
       d.text(ctx, '我', L.rowMe.label.x, L.rowMe.label.y + 10, font(400, T.scaled('caption', S), 'sans'), c.fg2);
       d.text(ctx, lastPlayer || '—', L.rowMe.text.x, L.rowMe.text.y + 14, font(400, 24, 'serif'), c.fg, { maxW: L.rowMe.text.w });
       d.text(ctx, '诗童', L.rowTiger.label.x, L.rowTiger.label.y + 10, font(400, T.scaled('caption', S), 'sans'), c.fg2);
       d.text(ctx, lastTiger || '—', L.rowTiger.text.x, L.rowTiger.text.y + 14, font(400, 24, 'serif'), c.fg, { maxW: L.rowTiger.text.w });
       // 判定原因行（回顾卡底部）
+      // 2026-11-21：长文案（雪耻奖励 +N）在 375 屏会溢出屏缘（无头截图实锤）→ 三档降字号 + maxW 兜底
       const rt = reasonText();
-      if (rt) d.text(ctx, '判定：' + rt, L.review.x + L.review.w / 2, L.reasonMid, font(400, T.scaled('caption', S), 'sans'), c.fg2, { align: 'center' });
+      if (rt) {
+        const rtFull = '判定：' + rt;
+        let rtFs = T.scaled('caption', S);
+        if (d.textWidth(ctx, rtFull, font(400, rtFs, 'sans')) > app.info.W - 24) {
+          rtFs = [18, 16, 15].find(fs => d.textWidth(ctx, rtFull, font(400, fs, 'sans')) <= app.info.W - 24) || 15;
+        }
+        d.text(ctx, rtFull, L.review.x + L.review.w / 2, L.reasonMid, font(400, rtFs, 'sans'), c.fg2, { align: 'center', maxW: app.info.W - 24 });
+      }
+      // 诗笺入口（2026-11-21）：右侧竖排书签「诗笺 v」——对局结束顺手把这几句讲明白
+      const gb = L.glossBtn;
+      ctx.beginPath();
+      ctx.moveTo(gb.x - 6, gb.y + 6); ctx.lineTo(gb.x - 6, gb.y + 70);
+      ctx.lineWidth = T.st.hair; ctx.strokeStyle = c.lineSoft; ctx.stroke();
+      d.text(ctx, '诗', gb.x + gb.w / 2, gb.y + 18, font(400, 17, 'serif'), c.primary, { align: 'center' });
+      d.text(ctx, '笺', gb.x + gb.w / 2, gb.y + 41, font(400, 17, 'serif'), c.primary, { align: 'center' });
+      ctx.beginPath();
+      ctx.moveTo(gb.x + gb.w / 2 - 4.5, gb.y + 58); ctx.lineTo(gb.x + gb.w / 2, gb.y + 63); ctx.lineTo(gb.x + gb.w / 2 + 4.5, gb.y + 58);
+      ctx.lineWidth = 1.5; ctx.strokeStyle = c.primary; ctx.stroke();
       // 按钮文字
       // 2026-11-18 修复：三按钮宽 90px 不随字号档缩放，h2 在大字号档（1.5×）
       // 时「回首页」溢出按钮贴屏缘（真机截图）→ 按钮内文字固定 20px（3 字 60px < 可用 78px）
@@ -178,6 +213,7 @@ function ResultScreen(app, params) {
       if (pressed) {
         const r = pressed.id === 'result.again' ? [L.againBtn.x, L.againBtn.y, L.againBtn.w, L.againBtn.h]
           : pressed.id === 'result.share' ? [L.shareBtn.x, L.shareBtn.y, L.shareBtn.w, L.shareBtn.h]
+          : pressed.id === 'result.gloss' ? [L.glossBtn.x - 8, L.glossBtn.y, L.glossBtn.w + 8, L.glossBtn.h]
           : [L.homeBtn.x, L.homeBtn.y, L.homeBtn.w, L.homeBtn.h];
         ctx.fillStyle = 'rgba(0,0,0,0.06)'; ctx.fillRect(r[0], r[1], r[2], r[3]);
       }
@@ -208,9 +244,15 @@ function ResultScreen(app, params) {
         // 2026-11-20 触摸互动：结算页全身立绘 头/肚/脚
         const zone = hit.slice(4);
         if (pet.trigger(zone)) {
-          sound.play(zone === 'head' ? 'purr' : zone === 'belly' ? 'giggle' : 'chirp');
+          // 三版沙雕音：pet.soundFor 统一映射（含连击过载 snore/laugh）
+          sound.play(pet.soundFor(zone, pet._fx() && pet._fx().combo));
           track.track('fhl_pet', { zone: zone === 'head' ? 1 : zone === 'belly' ? 2 : 3, scr: 3 });
         }
+        return;
+      }
+      if (hit === 'result.gloss') {
+        // 进诗笺看本局诗句释义（回程带 noSave，避免重复计局）
+        app.goto('gloss', { outcome });
         return;
       }
       if (hit === 'result.again') {

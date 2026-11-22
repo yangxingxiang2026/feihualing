@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>小诗童 · 造型检查（前肢 / 握笔 / 后肢）</title>
+<style>body { margin: 0; background: #F6EFE2; font-family: sans-serif; } canvas { display: block; }</style>
+</head>
+<body>
+<canvas id="c" width="1160" height="440"></canvas>
+<script src="../src/actors/tiger_renderer.js?v=11"></script>
+<script>
+  var cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  ctx.fillStyle = '#F6EFE2'; ctx.fillRect(0, 0, cv.width, cv.height);
+  var items = [
+    { state: 'idle', t: 0.7, x: 20, label: 'idle 站立：左爪握笔中上段' },
+    { state: 'pet', t: 0.7, x: 300, label: 'pet 摸头：踩奶 + 握笔' },
+    { state: 'cheer', t: 0.7, x: 580, label: 'cheer 欢呼：笔斜靠' },
+    { state: 'facepalm', t: 0.7, x: 860, label: 'facepalm 捂脸' }
+  ];
+  items.forEach(function (it) {
+    ctx.save();
+    ctx.translate(it.x, 14);
+    ctx.scale(0.7, 0.7);
+    TigerRenderer.draw(ctx, { state: it.state, t: it.t, theme: 'guofeng' });
+    ctx.restore();
+    ctx.fillStyle = '#4A3B2A'; ctx.font = '13px sans-serif';
+    ctx.fillText(it.label, it.x + 10, 428);
+  });
+</script>
+</body>
+</html>

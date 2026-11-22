@@ -97,3 +97,32 @@ test('非教学局不受影响：仍是 12 回合 / 非月字随机 / 无教学�
   }
   assert.ok(sawNonYue, '非教学局令字应随机（不应恒为月）');
 });
+
+test('教学局脚本句预留（2026-11-20 修提示复读）：AI 手牌/补牌永不占用脚本句 + 回落清旧提示', () => {
+  const aiLib = R('js/game/ai');
+  const scriptLines = C.TUTORIAL_ROUNDS.map(r => r.line);
+  const lineTextOf = i => corpus.lines[i].split('|')[0];
+  // ① 多种子下 AI 开局手牌都不含教学脚本句
+  for (const seed of [1, 5, 9, 21, 33, 777, 2026]) {
+    const m = new Match({ tutorial: true, seed });
+    const handTexts = m.ai.hand.map(i => lineTextOf(i));
+    assert.equal(
+      handTexts.some(t => scriptLines.includes(t)), false,
+      `seed ${seed} AI 手牌不应含脚本句：${handTexts.join('/')}`);
+  }
+  // ② 补牌路径同样预留：ai 实例携带预留集合，deal(1) 也不回脚本句
+  const ai = aiLib.create('rookie', '月', C.mulberry32(9), 'mixed', scriptLines);
+  assert.equal(ai.reserve.size, 3, '预留集合应随 ai 实例携带');
+  for (let k = 0; k < 20; k++) {
+    const more = aiLib.deal(1, '月', new Set(), C.mulberry32(100 + k), 'mixed', scriptLines);
+    assert.equal(more.some(i => scriptLines.includes(lineTextOf(i))), false, `补牌第 ${k + 1} 次不应回脚本句`);
+  }
+  // ③ 回落路径：脚本句被占（usedKeys 预置）→ 发牌回落且旧提示被清空（不再复读）
+  const m2 = new Match({ tutorial: true, seed: 9 });
+  m2.tutorialHint = '出自 张九龄《望月怀远》';   // 模拟第 2 回合残留
+  m2.tutorialTip = '有改过字的假句，要选真句';
+  m2.usedKeys.add(scriptLines[2]);              // 模拟诗童抢先接走第 3 回合脚本句
+  m2._dealRound();
+  assert.equal(m2.tutorialHint, null, '脚本回落必须清空旧 hint（防提示复读）');
+  assert.equal(m2.tutorialTip, null, '脚本回落必须清空旧 tip');
+});

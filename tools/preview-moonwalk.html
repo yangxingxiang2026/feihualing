@@ -1,0 +1,55 @@
+<!doctype html>
+<html><meta charset="utf8">
+<body style="margin:0;background:#F6EFE2">
+<canvas id="c" width="1240" height="780"></canvas>
+<script>document.write('<script src="../src/actors/tiger_renderer.js?v=' + Math.random() + '"><\/script>');</script>
+<script>document.write('<script src="../js/ui/pet.js?v=' + Math.random() + '"><\/script>');</script>
+<!--MAIN-->
+<script>
+  var cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  ctx.fillStyle = '#F6EFE2'; ctx.fillRect(0, 0, 1240, 780);
+
+  // 太空步专用放大页：4 帧看姿态（一脚平拖 / 一脚踮脚），下排 4 帧看地面刻度是否在走
+  var BOX = { w: 240, h: 336 };   // 缩放 0.6，脚掌/脚跟清清楚楚
+
+  function drive(secs, x, y) {
+    var p = Pet.create();
+    p.setBox({ x: x, y: y, w: BOX.w, h: BOX.h }, 'full');
+    p.trigger('head'); p.update(0.5);
+    p.trigger('head'); p.update(0.5);
+    p.trigger('head');
+    var n = Math.round(secs / 0.02);
+    for (var j = 0; j < n; j++) p.update(0.02);
+    return p;
+  }
+
+  function cell(x, y, inst, label) {
+    var off = inst.offset(), pz = inst.pose();
+    var pivX = x + BOX.w / 2, pivY = y + BOX.h;
+    ctx.save();
+    ctx.translate(pivX + off.dx, pivY + off.dy);
+    ctx.rotate(off.rot);
+    if (off.sx !== 1 || off.sy !== 1) ctx.scale(off.sx, off.sy);
+    ctx.translate(-pivX, -pivY);
+    TigerRenderer.draw(ctx, { state: pz.state || 'idle', t: 0.5, x: x, y: y, scale: BOX.h / 560, phase: pz.phase });
+    ctx.restore();
+    inst.draw(ctx);
+    ctx.fillStyle = '#6B4423'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(label, x + BOX.w / 2, y + BOX.h + 22);
+  }
+
+  // 一个循环 2.5s：0–1.25 左脚整掌后拖 / 右脚踮脚前摆；1.25–2.5 交换
+  var T = [0.64, 0.35, 1.26, 1.92];
+  var L = ['0.64s 拍点冲击：光环+沉降', '0.35s 拍中：拖尾渐慢',
+           '1.26s 第三拍起拖', '1.92s 第四拍冲击'];
+  for (var k = 0; k < T.length; k++) {
+    var x = 10 + k * 300, y = 20;
+    cell(x, y, drive(T[k], x, y), L[k]);
+  }
+  // 下排：同一姿态、不同时刻 → 只看地面刻度走了多远（证明是地面在走）
+  var T2 = [0.30, 1.30, 2.30, 3.30];
+  for (var k2 = 0; k2 < T2.length; k2++) {
+    var x2 = 10 + k2 * 300, y2 = 400;
+    cell(x2, y2, drive(T2[k2], x2, y2), T2[k2] + 's 地面刻度位置');
+  }
+</script>

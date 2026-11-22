@@ -107,6 +107,26 @@ function build() {
   const raw = JSON.parse(fs.readFileSync(SRC, 'utf8'));
   console.log(`[1/7] 读入源数据 ${raw.length} 条`);
 
+  // --- 勘误（2026-11-22）：错别字修复 + 截断诗整文替换（数据见 corrections.json，含依据注释） ---
+  let fixCount = 0, fullCount = 0, warn = [];
+  const corrections = JSON.parse(fs.readFileSync(path.join(__dirname, 'corrections.json'), 'utf8'));
+  const norm4cmp = s => (String(s || '').match(CJK_RUN) || []).join('');
+  for (const p of raw) {
+    const k = `${p.title}|${p.author}`;
+    // ① 按篇错字/缺句修复：find=null 前插；find 找不到则告警跳过（防误伤同题名他诗）
+    for (const [find, replace] of (corrections.fixes[k] || [])) {
+      if (find == null) { p.text = replace + p.text; fixCount++; continue; }
+      if (String(p.text).includes(find)) { p.text = String(p.text).replace(find, replace); fixCount++; }
+      else warn.push(`${k} 未命中 find: ${find}`);
+    }
+    // ② 截断诗整文替换：正文归一化后必须与 expect 前缀逐字一致，否则跳过
+    const full = corrections.fulls[k];
+    if (full && norm4cmp(p.text) === full.expect) { p.text = full.full; fullCount++; }
+    else if (full) warn.push(`${k} 前缀校验未过，跳过整文替换`);
+  }
+  if (fixCount || fullCount) console.log(`[1.5/7] 勘误：错字修复 ${fixCount} 处，截断诗整文替换 ${fullCount} 首${warn.length ? '，告警 ' + warn.length : ''}`);
+  warn.slice(0, 10).forEach(w => console.log('  [勘误告警]', w));
+
   // --- 散文剔除（双重判据） ---
   const removed = [];
   const kept = [];
@@ -173,11 +193,13 @@ function build() {
   const seenKey = new Set();
   const lines = []; // { key, srcIdx, level, poemId }
   const sourceMap = new Map(); // 'title|author|dynasty' -> idx
+  // 2026-11-21：全诗正文（诗笺页「整体解读」需要）——按 source 顺序落盘到 poem_text.js
+  const sourceText = [];
   let droppedDup = 0, droppedLen = 0;
   merged.forEach(item => {
     const { p, poemId, level } = item;
     const srcKey = `${p.title}|${p.author}|${p.dynasty}`;
-    if (!sourceMap.has(srcKey)) sourceMap.set(srcKey, sourceMap.size);
+    if (!sourceMap.has(srcKey)) { sourceMap.set(srcKey, sourceMap.size); sourceText[sourceMap.size - 1] = p.text; }
     const srcIdx = sourceMap.get(srcKey);
     for (const key of splitSentences(p.text)) {
       if (key.length !== 5 && key.length !== 7) { droppedLen++; continue; }
@@ -256,6 +278,22 @@ function build() {
   fs.writeFileSync(path.join(OUT_DATA, 'poems.js'), poemsJs, 'utf8');
   const poemsBytes = Buffer.byteLength(poemsJs, 'utf8');
   console.log(`      poems.js 落盘：${(poemsBytes / 1024).toFixed(1)} KB（${poemsBytes} bytes）`);
+
+  // --- 产物 2b：poem_text.js 全诗正文（2026-11-21 新增）---
+  // 与 corpus.sources 同下标对齐（T[i] 即 sources[i] 那首的全文）。
+  // 用途：诗笺页展示全诗 + 本局句高亮 + 整体解读；正文即 build 输入 p.text 原样，
+  // 不做任何改写（异文/断句以源数据为准，和句库同源同版本）。
+  const textJs = `'use strict';
+// 本文件由 tools/build/build-corpus.js 生成，禁止手工编辑。
+// 格式 T[i] = 该首全诗正文（含原标点），下标与 corpus.sources 一一对应。
+(function () {
+  var T = ${JSON.stringify(sourceText)};
+  module.exports = { version: 'v0.1', texts: T };
+})();
+`;
+  fs.writeFileSync(path.join(OUT_DATA, 'poem_text.js'), textJs, 'utf8');
+  const textBytes = Buffer.byteLength(textJs, 'utf8');
+  console.log(`      poem_text.js 落盘：${(textBytes / 1024).toFixed(1)} KB（${sourceText.length} 首）`);
 
   // --- 产物 2/3：剔除清单 + 统计 ---
   fs.writeFileSync(path.join(OUT_TOOL, 'removed-prose.json'), JSON.stringify({

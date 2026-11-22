@@ -63,7 +63,7 @@ test('小虎渲染器：4 状态 × 2 主题 × fullBody/bust 全部零异常', 
     });
   }
   const ctx = stubCtx();
-  assert.deepEqual(tiger.STATES, ['idle', 'clap', 'facepalm', 'cheer', 'pet']);
+  assert.deepEqual(tiger.STATES, ['idle', 'clap', 'facepalm', 'cheer', 'pet', 'moonwalk']);
   for (const theme of ['guofeng', 'anime']) {
     for (const state of tiger.STATES) {
       for (const t of [0, 1.2, 2.9, 4.5]) { // 覆盖呼吸/眨眼/拍击/撒花/踩奶相位

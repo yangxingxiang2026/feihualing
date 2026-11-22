@@ -53,7 +53,7 @@ test('入册：去重 + 上限 30 + 未雪耻优先保留', () => {
   for (let i = 0; i < 35; i++) lines.push('测试句' + i);
   store.addGrudgeLines(lines, 7);
   const g = store.loadGrudge();
-  assert.equal(g.length, store.GRUDGE_MAX, '仇册不得超 30 条');
+  assert.equal(g.length, store.GRUDGE_MAX, '错题本不得超 30 条');
   assert.ok(g.some(e => e.text === G1 && !e.avenged), '旧错句未雪耻应保留');
 });
 
@@ -67,7 +67,7 @@ test('熟成门槛：入册满 3 局才可甩，雪耻后永不再甩', () => {
   store.saveRecord(Object.assign({}, store.DEFAULT_RECORD, { games: 12 }));
   assert.deepEqual(store.grudgeRipe(), [G1], '满 3 局（12-10>=2）熟成');
   store.markGrudgeAvenged([G1]);
-  assert.deepEqual(store.grudgeRipe(), [], '雪耻后从仇册出句池移除');
+  assert.deepEqual(store.grudgeRipe(), [], '雪耻后从错题本出句池移除');
 });
 
 test('对局：诗童优先甩错句（aiPlay.grudge）且每局至多 2 句', () => {
@@ -81,7 +81,7 @@ test('对局：诗童优先甩错句（aiPlay.grudge）且每局至多 2 句', (
   assert.ok(m.outcome, '对局须正常走到结算');
 });
 
-test('反杀翻倍：接上仇册句 → +2、revenge 标记、雪耻回写', () => {
+test('反杀翻倍：接上错题本句 → +2、revenge 标记、雪耻回写', () => {
   store.saveGrudge([]);
   store.saveRecord(Object.assign({}, store.DEFAULT_RECORD, { games: 12 }));
   store.addGrudgeLines([G1], 1);
@@ -97,10 +97,10 @@ test('反杀翻倍：接上仇册句 → +2、revenge 标记、雪耻回写', ()
   guard = 0;
   while (m.phase !== 'player' && guard++ < 200) m.update(0.05);
   const snap = m.snapshot();
-  assert.ok(snap.revenge && !snap.revenge.avenged, '决策期快照应携带悬着的雪耻回合（UI 仇册签依据）');
+  assert.ok(snap.revenge && !snap.revenge.avenged, '决策期快照应携带悬着的雪耻回合（UI 错题本签依据）');
   m.submitChoice(m.candidates.correctPos);
   assert.equal(m.feedback.kind, 'pass');
-  assert.equal(m.feedback.revenge, true, '接上仇册句须标记 revenge');
+  assert.equal(m.feedback.revenge, true, '接上错题本句须标记 revenge');
   assert.equal(m.playerHits, hitsBefore + 2, '反杀翻倍 = 正常 +1 再奖 +1');
   assert.equal(m.revengeRound, null, '雪耻回合已消费');
   assert.deepEqual(m.revengeKills, [G1], '雪耻清单须记录该错句');
@@ -110,7 +110,7 @@ test('反杀翻倍：接上仇册句 → +2、revenge 标记、雪耻回写', ()
   assert.ok(r.kills >= 1, 'outcome.stats.revenge.kills 应统计');
   store.applyOutcome(m.outcome);
   const g = store.loadGrudge().find(e => e.text === G1);
-  assert.ok(g && g.avenged, '结算后仇册该句须标记已雪耻');
+  assert.ok(g && g.avenged, '结算后错题本该句须标记已雪耻');
   assert.ok(!store.grudgeRipe().includes(G1), '已雪耻句不得再进甩句池');
 });
 
@@ -159,5 +159,18 @@ test('教学局隔离：不入册、不甩句、不计战绩', () => {
   const before = store.loadRecord().games;
   store.applyOutcome(m.outcome);
   assert.equal(store.loadRecord().games, before, '教学局不得计入战绩');
-  assert.equal(store.loadGrudge().length, 0, '教学局不得写仇册');
+  assert.equal(store.loadGrudge().length, 0, '教学局不得写错题本');
+});
+
+test('术语更名：UI 文案统一「错题本」，不得回退成「仇册」', () => {
+  // 2026-11-21 用户要求「把仇册改为错题本」。注释里保留更名说明，只校验字符串字面量，
+  // 防止后续改 UI 时又把旧词带回来（术语漂移是最难被功能测试抓到的回归）。
+  const fs = require('fs');
+  const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+  const battle = strip(fs.readFileSync(path.join(ROOT, 'js/ui/screens/battle.js'), 'utf8'));
+  const home = strip(fs.readFileSync(path.join(ROOT, 'js/ui/screens/home.js'), 'utf8'));
+  assert.equal(battle.includes('仇册'), false, 'battle.js 字符串里不得再出现「仇册」');
+  assert.equal(home.includes('仇册'), false, 'home.js 字符串里不得再出现「仇册」');
+  assert.ok(battle.includes("'【错题本】'"), '上句区错题签须为「【错题本】」');
+  assert.ok(home.includes('错题本 ${gs.pending} 句'), '首页战绩签须提示错题本条数');
 });

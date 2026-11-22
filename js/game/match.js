@@ -64,7 +64,10 @@ class Match {
     // 失手回合的正解与干扰项不走 usedKeys，若无此集合会随后续回合/AI 补牌再次出现，
     // 玩家视角即"同一局出现重复题目"。生成器与 AI 补牌统一经 _genUsed()/_actUsed() 避开。
     this.shown = new Set();
-    this.ai = aiLib.create(this.cfg.aiLevel, this.keyword, this.rng, this.cfg.aiDifficulty);
+    // 2026-11-20 修「教学局提示复读」根因：AI 手牌预留三句教学脚本——否则诗童可抢先
+    // 接走脚本句（如「月落乌啼霜满天」），第 3 回合脚本发牌 used.has 命中回落常规发牌
+    const tutorialReserve = tutorial ? C.TUTORIAL_ROUNDS.map(r => r.line) : [];
+    this.ai = aiLib.create(this.cfg.aiLevel, this.keyword, this.rng, this.cfg.aiDifficulty, tutorialReserve);
     this.roundSeq = 0;                  // 已完成回合数
     this.playerHits = 0; this.tigerHits = 0;
     this.timeouts = 0;                  // 玩家超时回合数（本回合判负分，不终局）
@@ -72,6 +75,8 @@ class Match {
     this.combo = 0; this.maxCombo = 0;
     this.reactSum = 0; this.reactN = 0;
     this.lastPlayerLine = null; this.lastTigerLine = null;
+    // 本局亮过的真句（玩家接对 + 诗童接对，去重保序）——结算页「诗笺」取释义用
+    this.roundLines = [];
     this.phase = 'idle'; this.phaseT = 0;
     this.candidates = null; this.blocks = null;
     this.pending = null;                // 判定前暂存
@@ -83,7 +88,7 @@ class Match {
     this.grudgeNew = [];                // 本局玩家失手回合的正解（结算后入册）
     this.revengePlays = 0;              // 本局已甩错句数（≤2，防刷屏）
     this.revengeRound = null;           // {text, avenged}——诗童甩出错句后待玩家雪耻的回合
-    this.revengeKills = [];             // 本局雪耻成功的错句文本（结算回写仇册）
+    this.revengeKills = [];             // 本局雪耻成功的错句文本（结算回写错题本）
     this._dealRound();
   }
 
@@ -133,6 +138,10 @@ class Match {
           this.tutorialTip = t.tutorial.tip;
         } else {
           this.candidates = C.genChoiceCandidates(this.keyword, genUsed, this.rng, this.cfg.candidateCount, easy);
+          // 脚本回落（2026-11-20 修提示复读）：常规发牌没有教学提示，必须清掉上一回合
+          // 的旧 hint/tip，否则 UI 继续展示过期文案（真机/冒烟均复现过）
+          this.tutorialHint = null;
+          this.tutorialTip = null;
         }
       } else {
         this.candidates = C.genChoiceCandidates(this.keyword, genUsed, this.rng, this.cfg.candidateCount, easy);
@@ -181,6 +190,8 @@ class Match {
     this.outcome = {
       result, reason,
       tutorial: this.cfg.tutorial,
+      // 本局亮过的句子（诗笺释义的取数口径；最多 12 句，够两页卡）
+      lines: this.roundLines.slice(0, 12),
       stats: { hits: this.playerHits, tigerHits: this.tigerHits, maxCombo: this.maxCombo,
                avgReact: avg, rounds: this.roundSeq, timeouts: this.timeouts, keyword: this.keyword,
                // 错句复仇：入册前剔除当局已被玩家自己接上的句（失手后补接的不算仇）
@@ -197,7 +208,7 @@ class Match {
       this._enter('aiThink');
       return;
     }
-    // 玩家回合结束 → AI 回合（错句复仇：优先甩仇册错句，压过普通出句）
+    // 玩家回合结束 → AI 回合（错句复仇：优先甩错题本错句，压过普通出句）
     const act = this._pickGrudge() || aiLib.act(this.ai, this.keyword, this._actUsed(), this.phaseT);
     this.pendingAI = act;
     if (act.action === 'exhausted') { this._toResult('win', 'aiExhausted'); return; }
@@ -257,6 +268,7 @@ class Match {
               this._accept(act.lineIdx);
               this.tigerHits++; this.combo = 0;
               this.lastTigerLine = t;
+              if (this.roundLines.indexOf(t) < 0) this.roundLines.push(t);
               this.feedback = { kind: 'aiPlay', reason: 'OK', text: t, grudge: !!act.grudge };
               // 甩出错句 → 挂起雪耻回合：玩家下一次接对即反杀翻倍
               if (act.grudge) { this.revengePlays++; this.revengeRound = { text: t, avenged: false }; }
@@ -286,6 +298,7 @@ class Match {
       this.usedKeys.add(text);
       this.playerHits++; this.combo++; this.maxCombo = Math.max(this.maxCombo, this.combo);
       this.lastPlayerLine = text;
+      if (this.roundLines.indexOf(text) < 0) this.roundLines.push(text);
       const extra = extra0 || {};
       // 错句复仇反杀：诗童甩出的错句被接上 → 本回合得分翻倍 + 雪耻标记
       if (this.revengeRound && !this.revengeRound.avenged) {
@@ -326,7 +339,9 @@ class Match {
       return true;
     }
     this.keyword = next;
-    this.ai = aiLib.create(this.cfg.aiLevel, next, this.rng, this.cfg.aiDifficulty); // v1.4 §2.6.6 换字重置手牌
+    // v1.4 §2.6.6 换字重置手牌；教学局脚本句预留保持（换字后教学脚本随旧字作废，
+    // 但预留无害——脚本句不含新令字本就不可能在手牌）
+    this.ai = aiLib.create(this.cfg.aiLevel, next, this.rng, this.cfg.aiDifficulty, this.cfg.tutorial ? C.TUTORIAL_ROUNDS.map(r => r.line) : []);
     this.usedKeys = new Set();                                 // 与手牌一并重置
     this.revengeRound = null;                                  // 悬着的雪耻回合随旧字上下文一并作废
     this._dealRound();
@@ -357,7 +372,7 @@ class Match {
       tutorial: this.cfg.tutorial
         ? { step: Math.min(this.roundSeq + 1, this.cfg.roundMax), total: this.cfg.roundMax, hint: this.tutorialHint, tip: this.tutorialTip }
         : null,
-      // 错句复仇：甩出错句后挂起的雪耻回合（上句区「仇册」签 + 反杀翻倍 UI 依据）
+      // 错句复仇：甩出错句后挂起的雪耻回合（上句区「错题本」签 + 反杀翻倍 UI 依据）
       revenge: this.revengeRound ? { text: this.revengeRound.text, avenged: this.revengeRound.avenged } : null,
       outcome: this.outcome,
     };

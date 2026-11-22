@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>诗笺页 · 单页预览</title>
+<style>
+  html, body { margin: 0; background: #1E1A16; }
+  canvas { display: block; width: 375px; height: 667px; }
+</style>
+</head>
+<body>
+<script src="./bundle.js"></script>
+<script>
+  // 无头截图用：直接进诗笺页。URL 参数 ?p=页序（1 起）&sc=滚动 px 可定位任意状态。
+  (function () {
+    if (!window.__fhl) return;
+    window.__fhl.app.settings.reduceMotion = true; // 截图定帧：跳过打字机/入场动画
+    window.__fhl.goto('gloss', {
+      outcome: {
+        result: 'win', reason: 'roundsFull',
+        stats: { hits: 5, tigerHits: 3, rounds: 12, keyword: '月', revenge: { kills: 0, newGrudge: [] } },
+        lines: ['明月几时有', '月照一天雪', '谁念西风独自凉', '花自飘零水自流'],
+      },
+    });
+    var q = new URLSearchParams(location.search);
+    // 触摸必须等首帧画完（滚动判据依赖测量缓存），virtual-time-budget 会推进 setTimeout
+    setTimeout(function () {
+      var scene = window.__fhl.app.scene;
+      if (!scene || scene.id !== 'gloss') return;
+      var p = parseInt(q.get('p') || '1', 10);
+      for (var i = 1; i < p && scene.touch; i++) scene.touch('start', 172, 611), scene.touch('end', 172, 611);
+      var sc = parseInt(q.get('sc') || '0', 10);
+      if (sc > 0 && scene.touch) {
+        scene.touch('start', 187, 300);
+        scene.touch('move', 187, 300 - sc);
+        scene.touch('end', 187, 300 - sc);
+      }
+    }, 80);
+  })();
+</script>
+</body>
+</html>
